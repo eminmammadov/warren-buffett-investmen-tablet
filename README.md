@@ -11,4 +11,5 @@ This approach allows individual investors to follow the investment wisdom of one
 Remember, this is a snapshot of Berkshire's current holdings. As Berkshire changes positions, you may want to periodically rebalance your portfolio to maintain similar proportions,
 
 🔗 Code: https://github.com/eminmammadov/warren-buffett-investmen-tablet
+
 🔗 Source: https://investing.com/pro/ideas/warren-buffett?entry=academy
