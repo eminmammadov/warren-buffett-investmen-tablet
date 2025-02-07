@@ -1,4 +1,5 @@
 import React from 'react';
+import { PieChart, Pie, Cell, LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const PortfolioAllocation = () => {
   const allocations = [
@@ -29,10 +30,38 @@ const PortfolioAllocation = () => {
     { ticker: 'FWON.K', name: 'Formula One Group', percentage: 0.2, dollars: 10.00 }
   ];
 
+  // Only show top 10 holdings in Pie Chart for better visibility
+  const topHoldings = allocations.slice(0, 10);
+  const otherHoldings = {
+    ticker: 'Others',
+    name: 'Other Holdings',
+    percentage: allocations.slice(10).reduce((sum, item) => sum + item.percentage, 0),
+    dollars: allocations.slice(10).reduce((sum, item) => sum + item.dollars, 0)
+  };
+
+  const pieData = [...topHoldings, otherHoldings];
+
+  // Colors for the pie chart
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#a4de6c', '#d0ed57', '#8884d8'];
+
+  // Generate monthly projection data (assuming $1000 monthly addition)
+  const monthlyProjection = Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    const baseAmount = 5000 + (month * 1000);
+    return {
+      month: `Month ${month}`,
+      totalValue: baseAmount,
+      monthlyContribution: 1000,
+      portfolioGrowth: baseAmount
+    };
+  });
+
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
+    <div className="w-full max-w-6xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">$5000 Portfolio Distribution</h2>
-      <div className="border rounded-lg overflow-hidden">
+      
+      {/* Portfolio Table */}
+      <div className="border rounded-lg overflow-hidden mb-8">
         <div className="overflow-x-auto">
           <table className="w-full border-collapse bg-white">
             <thead>
@@ -69,6 +98,63 @@ const PortfolioAllocation = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        {/* Pie Chart */}
+        <div className="border rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Portfolio Distribution (Top 10 Holdings)</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={pieData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ ticker, percentage }) => `${ticker} (${percentage}%)`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="dollars"
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Bar Chart */}
+        <div className="border rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-4">Top 10 Holdings by Value ($)</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={topHoldings}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="ticker" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="dollars" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Line Chart for Monthly Projection */}
+      <div className="border rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-4">12-Month Projection with $1000 Monthly Addition</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={monthlyProjection}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="portfolioGrowth" stroke="#8884d8" name="Total Portfolio Value" />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
